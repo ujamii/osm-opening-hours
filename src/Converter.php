@@ -57,7 +57,20 @@ class Converter
                 $exceptions = $parsedRuleset['exceptions'];
                 unset($parsedRuleset['exceptions']);
             }
-            $resultingConfig = array_merge($resultingConfig, $parsedRuleset);
+            // this must not be merged by default as later rules overwrite earlier ones
+            // on the other hand it HAS merged to be when certain criteria are connected (like "odd weeks only")
+            foreach ($parsedRuleset as $dayKey => $parsedDayItem) {
+                $mergedConfigs = $parsedDayItem;
+                if (isset($resultingConfig[$dayKey])) {
+                    foreach ($resultingConfig[$dayKey] as $oldData) {
+                        if (is_array($oldData)) {
+                            array_unshift($mergedConfigs, $oldData);
+                        }
+                    }
+                }
+                $resultingConfig[$dayKey] = $mergedConfigs;
+            }
+
             if (!empty($exceptions)) {
                 $resultingConfig['exceptions'] = array_merge_recursive($resultingConfig['exceptions'] ?? [], $exceptions);
             }
@@ -105,7 +118,9 @@ class Converter
         $hoursValue = explode(',', $openingHours);
 
         if (null !== $weekInfo) {
-            $hoursValue['data'] = $weekInfo;
+            foreach ($hoursValue as $key => $value) {
+                $hoursValue[$key] = [$value, 'data' => $weekInfo];
+            }
         }
         $weekdays = [];
 
