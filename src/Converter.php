@@ -73,7 +73,7 @@ class Converter
         }
 
         if ('24/7' === $ruleSet) {
-            return self::getWeekdayArray('Mo', 'Su', '00:00-24:00');
+            return self::getWeekdayArray('Mo-Su', '00:00-24:00');
         }
 
         if (str_ends_with($ruleSet, 'off')) {
@@ -88,31 +88,49 @@ class Converter
         // TODO: week_range
         // TODO: holidays
 //var_dump($ruleSet);
-        preg_match('%(week [0-9/-]+ )?((Mo|Tu|We|Th|Fr|Sa|Su)(-(Mo|Tu|We|Th|Fr|Sa|Su))? )?((?:\d\d:\d\d-\d\d:\d\d,?)+)%', $ruleSet, $matches);
+        preg_match('%(week [0-9/-]+ )?((?:(Mo|Tu|We|Th|Fr|Sa|Su)[-,]?)+) ?((?:\d\d:\d\d-\d\d:\d\d,?)+)%', $ruleSet, $matches);
 //var_dump($matches);
-        [$fullMatch, $weeks, $weekdayRangeFull, $weekdayStart, $weekdayRangeEnd, $weekdayEnd, $openingHours] = $matches;
+        [$fullMatch, $weeks, $weekdayRangeFull, $weekdayEnd, $openingHours] = $matches;
 
-        return self::getWeekdayArray($weekdayStart, $weekdayEnd, $openingHours, $weeks);
+        return self::getWeekdayArray($weekdayRangeFull, $openingHours, $weeks);
     }
 
-    protected static function getWeekdayArray(string $weekdayStart, string $weekdayEnd, string $openingHours, string $weeks = ''): array
+    protected static function getWeekdayArray(string $weekdayRangeFull, string $openingHours, string $weeks = ''): array
     {
         $weekDayNamesShort = array_keys(self::WEEKDAYS);
-        $startIndex = array_search($weekdayStart, $weekDayNamesShort, true);
-        $endIndex = !empty($weekdayEnd) ? array_search($weekdayEnd, $weekDayNamesShort, true) : $startIndex;
-
         $weekInfo = self::parseWeeks($weeks);
+        $isRange = strstr($weekdayRangeFull, '-');
+        $isList = strstr($weekdayRangeFull, ',');
 
-        for ($i = $startIndex; $i <= $endIndex; $i++) {
-            $hoursValue = explode(',', $openingHours);
+        $hoursValue = explode(',', $openingHours);
 
-            if (null !== $weekInfo) {
-                $hoursValue['data'] = $weekInfo;
+        if (null !== $weekInfo) {
+            $hoursValue['data'] = $weekInfo;
+        }
+        $weekdays = [];
+
+        if ($isRange) {
+            [$weekdayStart, $weekdayEnd] = explode('-', $weekdayRangeFull);
+            $startIndex = array_search($weekdayStart, $weekDayNamesShort, true);
+            $endIndex = !empty($weekdayEnd) ? array_search($weekdayEnd, $weekDayNamesShort, true) : $startIndex;
+
+            for ($i = $startIndex; $i <= $endIndex; $i++) {
+                $weekdays[self::WEEKDAYS[$weekDayNamesShort[$i]]] = $hoursValue;
             }
-            $weekdays[self::WEEKDAYS[$weekDayNamesShort[$i]]] = $hoursValue;
+            return $weekdays;
         }
 
-        return $weekdays ?? [];
+        if ($isList) {
+            $listOfDays = explode(',', $weekdayRangeFull);
+            foreach ($listOfDays as $day) {
+                $weekdays[self::WEEKDAYS[$day]] = $hoursValue;
+            }
+            return $weekdays;
+        }
+
+        // single day
+        $weekdays[self::WEEKDAYS[$weekdayRangeFull]] = $hoursValue;
+        return $weekdays;
     }
 
     protected static function parseException(string $ruleSet): array
