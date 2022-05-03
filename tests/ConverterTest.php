@@ -51,15 +51,35 @@ class ConverterTest extends TestCase
                     'saturday' => ['10:00-20:00'],
                 ]
             ],
-            //'Open from 09:00 to 12:00 on Fridays of odd weeks and on the Wednesdays of even weeks' => [
-            //    'osmString' => 'week 1-53/2 Fr 09:00-12:00; week 2-52/2 We 09:00-12:00',
-            //    'expected' => []
-            //],
-            //'alternating weeks with exceptions' => [
-            //    'osmString' => 'week 01-51/2 Sa 08:00-12:00; Mo 11:30-17:00; Tu 11:30-18:00; Dec 23-31 off; Jan 24 off; Oct 10 off; PH off; Apr 16 off',
-            //    'expected' => []
-            //],
+            'Open from 09:00 to 12:00 on Fridays of odd weeks and on the Wednesdays of even weeks' => [
+                'osmString' => 'week 01-53/2 Fr 09:00-12:00; week 02-52/2 We 09:00-12:00',
+                'expected' => [
+                    'wednesday' => ['09:00-12:00', 'data' => Converter::WEEKS_EVEN],
+                    'friday' => ['09:00-12:00', 'data' => Converter::WEEKS_ODD],
+                ]
+            ],
+            'alternating weeks with exceptions' => [
+                'osmString' => 'week 01-51/2 Sa 08:00-12:00; Mo 11:30-17:00; Tu 11:30-18:00; Dec 23-31 off; Jan 24 off; Oct 10 off; PH off; Apr 16 off',
+                'expected' => [
+                    'saturday' => ['08:00-12:00', 'data' => Converter::WEEKS_ODD],
+                    'monday' => ['11:30-17:00'],
+                    'tuesday' => ['11:30-18:00'],
+                    'exceptions' => [
+                        '12-23' => [],
+                        '12-24' => [],
+                        '12-25' => [],
+                        '12-26' => [],
+                        '12-27' => [],
+                        '12-28' => [],
+                        '12-29' => [],
+                        '12-30' => [],
+                        '12-31' => [],
+                        '01-24' => [],
+                        '10-10' => [],
+                        '04-16' => [],
+                    ]//TODO: PH is still missing here
+                ]
+            ],
         ];
     }
-
 }

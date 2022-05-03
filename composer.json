@@ -41,8 +41,7 @@
     "scripts-descriptions": {
         "phpunit": "Runs the unit tests in this package, configured in build/config/phpunit.xml.dist.",
         "phpstan": "Runs static code analysis, configured in build/config/phpstan.neon.",
-        "rector": "Runs rector on the src and tests directories, configured in build/config/rector.php.",
-        "php-cs-fixer": "Applies code style rules (PSR-12 and some more) to src and tests as configured in build/config/cs.php.",
+        "php-cs-fixer": "Applies code style rules (PSR-12) to src and tests as configured in build/config/cs.php.",
         "infection": "Runs mutation testing, configured in build/config/infection.json.dist.",
         "testall": "Runs the whole set of tests."
     },
