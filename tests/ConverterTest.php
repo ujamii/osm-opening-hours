@@ -51,6 +51,34 @@ class ConverterTest extends TestCase
                     'saturday' => ['10:00-20:00'],
                 ]
             ],
+            'Multiple opening intervals' => [
+                'osmString' => 'Mo-Fr 08:00-12:00,13:00-17:30',
+                'expected' => [
+                    'monday' => ['08:00-12:00', '13:00-17:30'],
+                    'tuesday' => ['08:00-12:00', '13:00-17:30'],
+                    'wednesday' => ['08:00-12:00', '13:00-17:30'],
+                    'thursday' => ['08:00-12:00', '13:00-17:30'],
+                    'friday' => ['08:00-12:00', '13:00-17:30'],
+                ],
+            ],
+            'Multiple days same time periods' => [
+                'osmString' => 'Mo,We 08:00-12:00',
+                'expected' => [
+                    'monday' => ['08:00-12:00'],
+                    'wednesday' => ['08:00-12:00'],
+                ],
+            ],
+            'Multiple days and multiple time periods' => [
+                'osmString' => 'Mo-Fr 08:00-12:00,13:00-17:30; Sa 08:00-12:00',
+                'expected' => [
+                    'monday' => ['08:00-12:00', '13:00-17:30'],
+                    'tuesday' => ['08:00-12:00', '13:00-17:30'],
+                    'wednesday' => ['08:00-12:00', '13:00-17:30'],
+                    'thursday' => ['08:00-12:00', '13:00-17:30'],
+                    'friday' => ['08:00-12:00', '13:00-17:30'],
+                    'saturday' => ['08:00-12:00'],
+                ],
+            ],
             'Open from 09:00 to 12:00 on Fridays of odd weeks and on the Wednesdays of even weeks' => [
                 'osmString' => 'week 01-53/2 Fr 09:00-12:00; week 02-52/2 We 09:00-12:00',
                 'expected' => [

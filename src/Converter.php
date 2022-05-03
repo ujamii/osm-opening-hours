@@ -87,9 +87,9 @@ class Converter
         // TODO: monthdays
         // TODO: week_range
         // TODO: holidays
-        //var_dump($ruleSet);
-        preg_match('%(week [0-9/-]+ )?((Mo|Tu|We|Th|Fr|Sa|Su)(-(Mo|Tu|We|Th|Fr|Sa|Su))? )?(\d\d:\d\d-\d\d:\d\d)?%', $ruleSet, $matches);
-        //var_dump($matches);
+//var_dump($ruleSet);
+        preg_match('%(week [0-9/-]+ )?((Mo|Tu|We|Th|Fr|Sa|Su)(-(Mo|Tu|We|Th|Fr|Sa|Su))? )?((?:\d\d:\d\d-\d\d:\d\d,?)+)%', $ruleSet, $matches);
+//var_dump($matches);
         [$fullMatch, $weeks, $weekdayRangeFull, $weekdayStart, $weekdayRangeEnd, $weekdayEnd, $openingHours] = $matches;
 
         return self::getWeekdayArray($weekdayStart, $weekdayEnd, $openingHours, $weeks);
@@ -104,7 +104,8 @@ class Converter
         $weekInfo = self::parseWeeks($weeks);
 
         for ($i = $startIndex; $i <= $endIndex; $i++) {
-            $hoursValue = [$openingHours];
+            $hoursValue = explode(',', $openingHours);
+
             if (null !== $weekInfo) {
                 $hoursValue['data'] = $weekInfo;
             }
@@ -116,7 +117,7 @@ class Converter
 
     protected static function parseException(string $ruleSet): array
     {
-        preg_match('%(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)? (\d\d)(-(\d\d))?%', $ruleSet, $matches);
+        \Safe\preg_match('%(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)? (\d\d)(-(\d\d))?%', $ruleSet, $matches);
 
         if (0 === count($matches)) {
             return [];
