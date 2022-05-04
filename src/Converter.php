@@ -37,6 +37,7 @@ class Converter
     public static function openingHoursFromOsmString(string $osmOpeningHours): OpeningHours
     {
         $configArray = self::configArrayFromOsmString($osmOpeningHours);
+
         return OpeningHours::create($configArray);
     }
 
@@ -75,6 +76,7 @@ class Converter
                 $resultingConfig['exceptions'] = array_merge_recursive($resultingConfig['exceptions'] ?? [], $exceptions);
             }
         }
+
         return $resultingConfig;
     }
 
@@ -100,9 +102,9 @@ class Converter
         // TODO: monthdays
         // TODO: week_range
         // TODO: holidays
-//var_dump($ruleSet);
+        //var_dump($ruleSet);
         preg_match('%(week [0-9/-]+ )?((?:(Mo|Tu|We|Th|Fr|Sa|Su)[-,]?)+) ?((?:\d\d:\d\d-\d\d:\d\d,?)+)%', $ruleSet, $matches);
-//var_dump($matches);
+        //var_dump($matches);
         [$fullMatch, $weeks, $weekdayRangeFull, $weekdayEnd, $openingHours] = $matches;
 
         return self::getWeekdayArray($weekdayRangeFull, $openingHours, $weeks);
@@ -132,6 +134,7 @@ class Converter
             for ($i = $startIndex; $i <= $endIndex; $i++) {
                 $weekdays[self::WEEKDAYS[$weekDayNamesShort[$i]]] = $hoursValue;
             }
+
             return $weekdays;
         }
 
@@ -140,11 +143,13 @@ class Converter
             foreach ($listOfDays as $day) {
                 $weekdays[self::WEEKDAYS[$day]] = $hoursValue;
             }
+
             return $weekdays;
         }
 
         // single day
         $weekdays[self::WEEKDAYS[$weekdayRangeFull]] = $hoursValue;
+
         return $weekdays;
     }
 
@@ -159,6 +164,7 @@ class Converter
         $monthName = $matches[1];
         $dayStart = $matches[2];
         $dayEnd = $matches[4] ?? '';
+
         return self::getDaysArray($monthName, $dayStart, $dayEnd);
     }
 
@@ -171,6 +177,7 @@ class Converter
             $hoursValue = $openingHours ? [$openingHours] : [];
             $daysArray[self::MONTHS[$monthName] . '-' . sprintf('%02d', $i)] = $hoursValue;
         }
+
         return $daysArray;
     }
 
