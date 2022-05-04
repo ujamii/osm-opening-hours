@@ -1,0 +1,24 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "phpUnit": {
+        "configDir": ".\/"
+    },
+    "logs": {
+        "text": "./build/coverage/infection-full.log",
+        "summary": "./build/coverage/infection-summary.log",
+        "github": true,
+        "stryker": {
+	        "badge": "main"
+        }
+    },
+    "mutators": {
+        "@default": true,
+        "ProtectedVisibility": false,
+        "CastInt": false,
+        "UnwrapTrim": false
+    }
+}
