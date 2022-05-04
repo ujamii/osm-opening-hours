@@ -1,6 +1,7 @@
 {
     "name": "ujamii/osm-opening-hours",
     "type": "library",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Ujamii\\OsmOpeningHours\\": "src"
