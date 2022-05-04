@@ -155,7 +155,7 @@ class Converter
 
     protected static function parseException(string $ruleSet): array
     {
-        \Safe\preg_match('%(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)? (\d\d)(-(\d\d))?%', $ruleSet, $matches);
+        preg_match('%(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)? (\d\d)(-(\d\d))?%', $ruleSet, $matches);
 
         if (0 === count($matches)) {
             return [];
@@ -188,7 +188,7 @@ class Converter
             return null;
         }
         // TODO: this may also be 01-51/3, so be more flexible here
-        if (\Safe\preg_match('%week (\d\d)-(\d\d)/2%', $input, $matches)) {
+        if (preg_match('%week (\d\d)-(\d\d)/2%', $input, $matches)) {
             if ((int) $matches[1] % 2 === 1) {
                 return self::WEEKS_ODD;
             }
