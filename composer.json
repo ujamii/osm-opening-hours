@@ -1,5 +1,6 @@
 {
     "name": "ujamii/osm-opening-hours",
+    "description": "Parser for Openstreetmap opening hours format",
     "type": "library",
     "license": "MIT",
     "autoload": {
