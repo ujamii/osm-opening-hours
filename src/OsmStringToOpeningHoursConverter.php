@@ -94,6 +94,14 @@ class OsmStringToOpeningHoursConverter
          * @var Filter $callableFilter
          */
         foreach ($specialFilters as $filterName => $callableFilter) {
+            if (!$callableFilter instanceof Filter) {
+                throw new \RuntimeException(sprintf(
+                    'Filter %s for ruleset %s needs to implement the Filter interface.',
+                    get_class($callableFilter),
+                    $ruleSet,
+                ));
+            }
+
             if (str_starts_with($ruleSet, $filterName)) {
                 if (str_ends_with($ruleSet, 'off')) {
                     $hours = [];
