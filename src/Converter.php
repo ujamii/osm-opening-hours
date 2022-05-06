@@ -3,6 +3,7 @@
 namespace Ujamii\OsmOpeningHours;
 
 use Spatie\OpeningHours\OpeningHours;
+use Ujamii\OsmOpeningHours\Filters\Filter;
 
 class Converter
 {
@@ -34,25 +35,26 @@ class Converter
     public const WEEKS_ODD = 1;
     public const WEEKS_EVEN = 2;
 
-    public static function openingHoursFromOsmString(string $osmOpeningHours): OpeningHours
+    public static function openingHoursFromOsmString(string $osmOpeningHours, array $specialFilters = []): OpeningHours
     {
-        $configArray = self::configArrayFromOsmString($osmOpeningHours);
+        $configArray = self::configArrayFromOsmString($osmOpeningHours, $specialFilters);
 
         return OpeningHours::create($configArray);
     }
 
     /**
      * @param string $osmOpeningHours
+     * @param array $specialFilters
      *
      * @return array
      * @see https://wiki.openstreetmap.org/wiki/Key:opening_hours#Summary_syntax
      */
-    public static function configArrayFromOsmString(string $osmOpeningHours): array
+    public static function configArrayFromOsmString(string $osmOpeningHours, array $specialFilters = []): array
     {
         $resultingConfig = [];
         $ruleSets = explode(';', $osmOpeningHours);
         foreach ($ruleSets as $ruleSet) {
-            $parsedRuleset = self::parseRuleSet($ruleSet);
+            $parsedRuleset = self::parseRuleSet($ruleSet, $specialFilters);
             $exceptions = [];
             if (isset($parsedRuleset['exceptions'])) {
                 $exceptions = $parsedRuleset['exceptions'];
@@ -80,11 +82,30 @@ class Converter
         return $resultingConfig;
     }
 
-    protected static function parseRuleSet(string $ruleSet): array
+    protected static function parseRuleSet(string $ruleSet, array $specialFilters = []): array
     {
         $ruleSet = trim($ruleSet);
         if ('' === $ruleSet) {
             return [];
+        }
+
+        /**
+         * @var string $filterName
+         * @var Filter $callableFilter
+         */
+        foreach ($specialFilters as $filterName => $callableFilter) {
+            if (str_starts_with($ruleSet, $filterName)) {
+                if (str_ends_with($ruleSet, 'off')) {
+                    $hours = [];
+                } else {
+                    preg_match('%((?:\d\d:\d\d-\d\d:\d\d,?)+)%', $ruleSet, $matches);
+                    $hours = explode(',', $matches[1]);
+                }
+
+                $callableFilter->setOpeningHours($hours);
+
+                return ['filters' => [[$callableFilter, 'applyFilter']]];
+            }
         }
 
         if ('24/7' === $ruleSet) {
@@ -101,7 +122,6 @@ class Converter
         // TODO: months
         // TODO: monthdays
         // TODO: week_range
-        // TODO: holidays
         //var_dump($ruleSet);
         preg_match('%(week [0-9/-]+ )?((?:(Mo|Tu|We|Th|Fr|Sa|Su)[-,]?)+) ?((?:\d\d:\d\d-\d\d:\d\d,?)+)%', $ruleSet, $matches);
         //var_dump($matches);
@@ -148,14 +168,12 @@ class Converter
         }
 
         // single day
-        $weekdays[self::WEEKDAYS[$weekdayRangeFull]] = $hoursValue;
-
-        return $weekdays;
+        return [self::WEEKDAYS[$weekdayRangeFull] => $hoursValue];
     }
 
     protected static function parseException(string $ruleSet): array
     {
-        preg_match('%(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)? (\d\d)(-(\d\d))?%', $ruleSet, $matches);
+        preg_match('%(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)? ?(\d\d)(-(\d\d))?%', $ruleSet, $matches);
 
         if (0 === count($matches)) {
             return [];
@@ -192,9 +210,9 @@ class Converter
             if ((int) $matches[1] % 2 === 1) {
                 return self::WEEKS_ODD;
             }
-        }
-        if ((int) $matches[1] % 2 === 0) {
-            return self::WEEKS_EVEN;
+            if ((int) $matches[1] % 2 === 0) {
+                return self::WEEKS_EVEN;
+            }
         }
 
         return null;
