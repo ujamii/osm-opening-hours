@@ -18,6 +18,11 @@
     "mutators": {
         "@default": true,
         "ProtectedVisibility": false,
+        "ConcatOperandRemoval": false,
+        "DecrementInteger": false,
+        "IncrementInteger": false,
+        "Minus": false,
+        "Plus": false,
         "CastInt": false,
         "UnwrapTrim": false
     }
