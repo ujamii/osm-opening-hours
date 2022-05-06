@@ -3,15 +3,15 @@
 namespace Ujamii\OsmOpeningHours\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Ujamii\OsmOpeningHours\Converter;
+use Ujamii\OsmOpeningHours\OsmStringToOpeningHoursConverter;
 use Ujamii\OsmOpeningHours\Filters\GermanPublicHolidayFilter;
 
-class ConverterTest extends TestCase
+class OsmStringToOpeningHoursConverterTest extends TestCase
 {
     /** @dataProvider configArrayFromOsmStringDataProvider */
     public function testConfigArrayFromOsmString(string $osmString, array $expected, array $filters = []): void
     {
-        $config = Converter::configArrayFromOsmString($osmString, $filters);
+        $config = OsmStringToOpeningHoursConverter::configArrayFromOsmString($osmString, $filters);
         self::assertEquals($expected, $config);
 
         if (count($filters) > 0) {
@@ -90,20 +90,20 @@ class ConverterTest extends TestCase
             'Open from 09:00 to 12:00 on Fridays of odd weeks and on the Wednesdays of even weeks' => [
                 'osmString' => 'week 01-53/2 Fr 09:00-12:00; week 02-52/2 We 09:00-12:00',
                 'expected'  => [
-                    'wednesday' => [['09:00-12:00', 'data' => Converter::WEEKS_EVEN]],
-                    'friday'    => [['09:00-12:00', 'data' => Converter::WEEKS_ODD]],
+                    'wednesday' => [['09:00-12:00', 'data' => OsmStringToOpeningHoursConverter::WEEKS_EVEN]],
+                    'friday'    => [['09:00-12:00', 'data' => OsmStringToOpeningHoursConverter::WEEKS_ODD]],
                 ]
             ],
             'Open from 9-12 on Fridays in odd weeks and from 14-18 in even weeks'                  => [
                 'osmString' => 'week 01-53/2 Fr 09:00-12:00; week 02-52/2 Fr 14:00-18:00',
                 'expected'  => [
-                    'friday' => [['09:00-12:00', 'data' => Converter::WEEKS_ODD], ['14:00-18:00', 'data' => Converter::WEEKS_EVEN]],
+                    'friday' => [['09:00-12:00', 'data' => OsmStringToOpeningHoursConverter::WEEKS_ODD], ['14:00-18:00', 'data' => OsmStringToOpeningHoursConverter::WEEKS_EVEN]],
                 ]
             ],
             'alternating weeks with exceptions'                                                    => [
                 'osmString' => 'week 01-51/2 Sa 08:00-12:00; Mo 11:30-17:00; Tu 11:30-18:00; Dec 23-31 off; Jan 24 off; Oct 10 off; PH off; Apr 16 off',
                 'expected'  => [
-                    'saturday'   => [['08:00-12:00', 'data' => Converter::WEEKS_ODD]],
+                    'saturday'   => [['08:00-12:00', 'data' => OsmStringToOpeningHoursConverter::WEEKS_ODD]],
                     'monday'     => ['11:30-17:00'],
                     'tuesday'    => ['11:30-18:00'],
                     'exceptions' => [

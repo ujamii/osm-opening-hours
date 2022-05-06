@@ -3,14 +3,14 @@
 namespace Ujamii\OsmOpeningHours\Tests\Filters;
 
 use PHPUnit\Framework\TestCase;
-use Ujamii\OsmOpeningHours\Converter;
+use Ujamii\OsmOpeningHours\OsmStringToOpeningHoursConverter;
 use Ujamii\OsmOpeningHours\Filters\GermanPublicHolidayFilter;
 
 class GermanPublicHolidayFilterTest extends TestCase
 {
     public function testFilterWithTimespanGetsApplied(): void
     {
-        $hours = Converter::openingHoursFromOsmString('Mo-Su 10:00-18:00; PH 09:00-12:00', ['PH' => new GermanPublicHolidayFilter()]);
+        $hours = OsmStringToOpeningHoursConverter::openingHoursFromOsmString('Mo-Su 10:00-18:00; PH 09:00-12:00', ['PH' => new GermanPublicHolidayFilter()]);
 
         self::assertTrue($hours->isOpenAt(new \DateTimeImmutable('2022-01-10 16:00:00')), 'open late on normal day');
         self::assertFalse($hours->isOpenAt(new \DateTimeImmutable('2022-01-01 16:00:00')), 'closed late on holiday');
@@ -19,7 +19,7 @@ class GermanPublicHolidayFilterTest extends TestCase
 
     public function testFilterWhenClosedGetsApplied(): void
     {
-        $hours = Converter::openingHoursFromOsmString('Mo-Su 10:00-18:00; PH off', ['PH' => new GermanPublicHolidayFilter()]);
+        $hours = OsmStringToOpeningHoursConverter::openingHoursFromOsmString('Mo-Su 10:00-18:00; PH off', ['PH' => new GermanPublicHolidayFilter()]);
 
         self::assertTrue($hours->isOpenAt(new \DateTimeImmutable('2022-01-10 16:00:00')), 'open late on normal day');
         self::assertFalse($hours->isOpenAt(new \DateTimeImmutable('2022-01-01 16:00:00')), 'closed late on holiday');

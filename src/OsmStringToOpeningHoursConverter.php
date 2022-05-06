@@ -5,7 +5,7 @@ namespace Ujamii\OsmOpeningHours;
 use Spatie\OpeningHours\OpeningHours;
 use Ujamii\OsmOpeningHours\Filters\Filter;
 
-class Converter
+class OsmStringToOpeningHoursConverter
 {
     public const WEEKDAYS = [
         'Mo' => 'monday',
