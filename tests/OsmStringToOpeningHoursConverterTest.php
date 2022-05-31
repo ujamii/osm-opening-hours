@@ -146,4 +146,10 @@ class OsmStringToOpeningHoursConverterTest extends TestCase
             ],
         ];
     }
+
+    public function testInvalidFilterObject(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        OsmStringToOpeningHoursConverter::configArrayFromOsmString('24/7', [new \DateTime()]);
+    }
 }
