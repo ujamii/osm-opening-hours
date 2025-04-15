@@ -2,13 +2,17 @@
 
 namespace Ujamii\OsmOpeningHours\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ujamii\OsmOpeningHours\OsmStringToOpeningHoursConverter;
 use Ujamii\OsmOpeningHours\Filters\GermanPublicHolidayFilter;
 
+#[CoversClass(GermanPublicHolidayFilter::class)]
+#[CoversClass(OsmStringToOpeningHoursConverter::class)]
 class OsmStringToOpeningHoursConverterTest extends TestCase
 {
-    /** @dataProvider configArrayFromOsmStringDataProvider */
+    #[DataProvider('configArrayFromOsmStringDataProvider')]
     public function testConfigArrayFromOsmString(string $osmString, array $expected, array $filters = []): void
     {
         $config = OsmStringToOpeningHoursConverter::configArrayFromOsmString($osmString, $filters);
@@ -20,7 +24,7 @@ class OsmStringToOpeningHoursConverterTest extends TestCase
         }
     }
 
-    public function configArrayFromOsmStringDataProvider(): array
+    public static function configArrayFromOsmStringDataProvider(): array
     {
         $germanPublicHolidayFilter = new GermanPublicHolidayFilter();
 

@@ -1,7 +1,7 @@
 # Openstreetmap opening hours parser in PHP
 
 [![Packagist](https://img.shields.io/packagist/v/ujamii/osm-opening-hours.svg?colorB=green&style=flat)](https://packagist.org/packages/ujamii/osm-opening-hours)
-[![Minimum PHP Version](https://img.shields.io/badge/php-8.0%2B-8892BF.svg?style=flat)](https://php.net/)
+[![Minimum PHP Version](https://img.shields.io/badge/php-8.2%2B-8892BF.svg?style=flat)](https://php.net/)
 [![Continuous Integration](https://github.com/ujamii/osm-opening-hours/actions/workflows/php.yml/badge.svg)](https://github.com/ujamii/osm-opening-hours/actions)
 
 
