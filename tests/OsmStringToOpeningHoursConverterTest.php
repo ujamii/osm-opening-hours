@@ -48,6 +48,16 @@ class OsmStringToOpeningHoursConverterTest extends TestCase
                     'sunday'   => ['00:00-24:00'],
                 ]
             ],
+            'Multiple lists and ranges'                                                            => [
+                'osmString' => 'Mo,Th-Fr,Su 12:00-13:30,19:00-21:00; Sa 12:00-13:30,19:00-21:01',
+                'expected'  => [
+                    'monday'    => ['12:00-13:30', '19:00-21:00'],
+                    'thursday'  => ['12:00-13:30', '19:00-21:00'],
+                    'friday'    => ['12:00-13:30', '19:00-21:00'],
+                    'saturday'  => ['12:00-13:30', '19:00-21:01'],
+                    'sunday'    => ['12:00-13:30', '19:00-21:00'],
+                ],
+            ],
             'Mo-Sa 10-20; Tu 10-14'                                                                => [
                 'osmString' => 'Mo-Sa 10:00-20:00; Tu 10:00-14:00',
                 'expected'  => [
