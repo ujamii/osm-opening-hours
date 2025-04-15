@@ -153,30 +153,24 @@ class OsmStringToOpeningHoursConverter
             }
         }
         $weekdays = [];
+        foreach (explode(',', $weekdayRangeFull) as $match) {
+            if (str_contains($match, '-')) {
+                [$weekdayStart, $weekdayEnd] = explode('-', $match);
+                $startIndex = array_search($weekdayStart, $weekDayNamesShort, true);
+                $endIndex = !empty($weekdayEnd) ? array_search($weekdayEnd, $weekDayNamesShort, true) : $startIndex;
 
-        if ($isRange) {
-            [$weekdayStart, $weekdayEnd] = explode('-', $weekdayRangeFull);
-            $startIndex = array_search($weekdayStart, $weekDayNamesShort, true);
-            $endIndex = !empty($weekdayEnd) ? array_search($weekdayEnd, $weekDayNamesShort, true) : $startIndex;
-
-            for ($i = $startIndex; $i <= $endIndex; $i++) {
-                $weekdays[self::WEEKDAYS[$weekDayNamesShort[$i]]] = $hoursValue;
+                for ($i = $startIndex; $i <= $endIndex; $i++) {
+                    $weekdays[self::WEEKDAYS[$weekDayNamesShort[$i]]] = $hoursValue;
+                }
+            } else {
+                $listOfDays = explode(',', $match);
+                foreach ($listOfDays as $day) {
+                    $weekdays[self::WEEKDAYS[$day]] = $hoursValue;
+                }
             }
-
-            return $weekdays;
         }
 
-        if ($isList) {
-            $listOfDays = explode(',', $weekdayRangeFull);
-            foreach ($listOfDays as $day) {
-                $weekdays[self::WEEKDAYS[$day]] = $hoursValue;
-            }
-
-            return $weekdays;
-        }
-
-        // single day
-        return [self::WEEKDAYS[$weekdayRangeFull] => $hoursValue];
+        return $weekdays;
     }
 
     protected static function parseException(string $ruleSet): array
