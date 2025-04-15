@@ -142,9 +142,6 @@ class OsmStringToOpeningHoursConverter
     {
         $weekDayNamesShort = array_keys(self::WEEKDAYS);
         $weekInfo = self::parseWeeks($weeks);
-        $isRange = strstr($weekdayRangeFull, '-');
-        $isList = strstr($weekdayRangeFull, ',');
-
         $hoursValue = explode(',', $openingHours);
 
         if (null !== $weekInfo) {
