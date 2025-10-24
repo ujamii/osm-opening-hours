@@ -156,6 +156,12 @@ class OsmStringToOpeningHoursConverter
                 $startIndex = array_search($weekdayStart, $weekDayNamesShort, true);
                 $endIndex = !empty($weekdayEnd) ? array_search($weekdayEnd, $weekDayNamesShort, true) : $startIndex;
 
+                // in case the period is of Type "Mo-Sat"
+                if ($startIndex > $endIndex) {
+                    $weekDayNamesShort = array_merge($weekDayNamesShort, $weekDayNamesShort);
+                    $endIndex = $endIndex + 7;
+                }
+
                 for ($i = $startIndex; $i <= $endIndex; $i++) {
                     $weekdays[self::WEEKDAYS[$weekDayNamesShort[$i]]] = $hoursValue;
                 }
