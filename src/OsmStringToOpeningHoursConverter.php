@@ -159,7 +159,7 @@ class OsmStringToOpeningHoursConverter
                 // in case the period is of Type "Mo-Sat"
                 if ($startIndex > $endIndex) {
                     $weekDayNamesShort = array_merge($weekDayNamesShort, $weekDayNamesShort);
-                    $endIndex = $endIndex + 7;
+                    $endIndex += 7;
                 }
 
                 for ($i = $startIndex; $i <= $endIndex; $i++) {
