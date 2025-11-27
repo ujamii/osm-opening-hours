@@ -158,6 +158,27 @@ class OsmStringToOpeningHoursConverterTest extends TestCase
                     'friday'    => ['09:00-10:00'],
                 ]
             ],
+            'starting_on_monday' => [
+                'osmString' => 'Su-Sa 00:00-24:00',
+                'expected' => [
+                    'sunday'    => ['00:00-24:00'],
+                    'monday'    => ['00:00-24:00'],
+                    'tuesday'   => ['00:00-24:00'],
+                    'wednesday' => ['00:00-24:00'],
+                    'thursday'  => ['00:00-24:00'],
+                    'friday'    => ['00:00-24:00'],
+                    'saturday'  => ['00:00-24:00'],
+                ]
+            ],
+            'starting_on_monday_with_off_period' => [
+                'osmString' => 'Su-Tu,Sa 00:00-24:00; We-Fr off',
+                'expected' => [
+                    'sunday'    => ['00:00-24:00'],
+                    'monday'    => ['00:00-24:00'],
+                    'tuesday'   => ['00:00-24:00'],
+                    'saturday'  => ['00:00-24:00'],
+                ]
+            ]
         ];
     }
 
