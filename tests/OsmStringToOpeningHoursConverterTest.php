@@ -178,7 +178,13 @@ class OsmStringToOpeningHoursConverterTest extends TestCase
                     'tuesday'   => ['00:00-24:00'],
                     'saturday'  => ['00:00-24:00'],
                 ]
-            ]
+            ],
+            'same_weekday' => [
+                'osmString' => 'Su-Su 09:00-17:00',
+                'expected' => [
+                    'sunday'    => ['09:00-17:00'],
+                ]
+            ],
         ];
     }
 
