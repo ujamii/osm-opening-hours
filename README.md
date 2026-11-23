@@ -1,7 +1,7 @@
 # Openstreetmap opening hours parser in PHP
 
 [![Packagist](https://img.shields.io/packagist/v/ujamii/osm-opening-hours.svg?colorB=green&style=flat)](https://packagist.org/packages/ujamii/osm-opening-hours)
-[![Minimum PHP Version](https://img.shields.io/badge/php-8.2%2B-8892BF.svg?style=flat)](https://php.net/)
+[![Minimum PHP Version](https://img.shields.io/badge/php-8.5%2B-8892BF.svg?style=flat)](https://php.net/)
 [![Continuous Integration](https://github.com/ujamii/osm-opening-hours/actions/workflows/php.yml/badge.svg)](https://github.com/ujamii/osm-opening-hours/actions)
 
 
@@ -21,12 +21,42 @@ $hours->isOpenAt(new \DateTimeImmutable('2022-03-06 16:00:00')); // false, as th
 ```
 
 There are a lot more methods on the `$hours` object, please check the [docs](https://github.com/spatie/opening-hours#usage) of that library.
-Of course, you can also use some more complex input like (please also check the [docs](https://wiki.openstreetmap.org/wiki/Key:opening_hours))
+Of course, you can also use more complex input (please also check the [docs](https://wiki.openstreetmap.org/wiki/Key:opening_hours))
 and the list of missing features below to see what's actually possible:
 
 ```
 Mo-Fr 08:00-12:00,13:00-17:30; Sa 08:00-12:00
 Sa 08:00-12:00; Mo 11:30-17:00; Tu 11:30-18:00; Dec 23-31 off; Jan 24 off; Oct 10 off; PH off; Apr 16 off
+2026-2028: Jun-Aug Mo-Fr 10:00-20:00; 2026 Dec 24-2027 Jan 06 off
+week 14-24 Mo 10:00-12:00; week 1,3,7,34 Tu 10:00-12:00
+Th[1,3] 18:00-22:00; Fr[-1] 10:00-12:00; Sa[-1] +1 day 10:00-16:00
+```
+
+Supported selectors:
+
+| Selector  | Examples                                                    |
+|-----------|-------------------------------------------------------------|
+| Years     | `2026`, `2024-2028`, `2020-2030/2`, `2026+`                 |
+| Months    | `Jan`, `Jan-Mar`, `Nov-Feb`                                 |
+| Monthdays | `Dec 25`, `Dec 24-26`, `Dec 24-Jan 06`, `2026 Dec 24-2027 Jan 06` |
+| Weeks     | `week 05`, `week 14-24`, `week 01-53/3`, `week 1,3,7,34`    |
+| Weekdays  | `Mo`, `Mo-Fr`, `Fr-Mo`, `Mo,We,Fr`                          |
+| Nth weekday of a month | `Th[1]`, `Th[1,2-3]`, `Fr[-1]`, `Sa[-1] +1 day`, `Sa[1] -2 days` |
+| Times     | `10:00-12:00`, `08:00-12:00,13:00-17:30`, `24/7`            |
+| Modifiers | `off`, `closed`, `open`                                     |
+
+Later rules override earlier ones. Plain weekday rules and recurring dates are converted to weekdays and exceptions of
+`spatie/opening-hours`, all other rules (and rules that may overlap with them) are converted to filters.
+Filters are evaluated per date, so use date based methods like `isOpenAt()` or `forDate()`. The regular week returned
+by `forWeek()` only contains the plain weekday rules.
+
+### Validation
+
+The conversion is lenient and skips rules it cannot parse. To check an OSM string first, use
+
+```php
+OsmStringToOpeningHoursConverter::isValid('Mo-Fr 10:00-18:00; PH off', ['PH' => new GermanPublicHolidayFilter()]); // true
+OsmStringToOpeningHoursConverter::validate('Mo-Fr 10:00-18:00; foo'); // throws InvalidOsmStringException: Invalid rule "foo".
 ```
 
 If you also need to support the public holiday feature (like `PH off` in the example above), you have to pass in a filter like this:
@@ -44,6 +74,7 @@ may look like `['PH' => new GermanPublicHolidayFilter()]` where the key `PH` has
 and the value is an instance of your filter class. 
 Input values like `PH 09:00-12:00` or `PH off` will be parsed and given to the filter in the `setOpeningHours` method. The `spatie/opening-hours`
 library will call the `applyFilter(\DateTimeImmutable $date)` method internally when something like `isOpenAt` is requested.
+Special filters always take precedence over the other rules.
 
 ## Running tests
 
@@ -58,14 +89,16 @@ whatever you are able to do to improve the project. Just fork and PR.
 
 If you want to do me a favour, buy me something from my [Amazon wishlist](https://www.amazon.de/registry/wishlist/2C7LSRMLEAD4F).
 
+## Upgrading to 3.0
+
+- Alternating weeks like `week 01-53/2 Fr 09:00-12:00` are converted to filters. The `data` attribute and the
+  constants `WEEKS_ODD` and `WEEKS_EVEN` were removed.
+- Rules with year, month, monthday, week or nth weekday selectors are converted to filters and therefore missing
+  in `forWeek()`. Use `forDate()` for each day of the week you want to show instead.
+- `Mo off` closes mondays, rules that cannot be parsed are skipped (use `validate()` to detect them).
+
 ## Known issues / missing features
 
-- the `spatie/opening-hours` library does not support different settings for a weekday based on the week (like
-  `week 01-53/2 Fr 09:00-12:00; week 02-52/2 Fr 14:00-18:00`), so we have to add this information via the data
-  attribute which the library supports for each given opening hour value (this may be solved by another filter)
-- constraint features like years, year_range, year, months, monthdays and week_range are not or not completely supported. This may
-  also be solved by the filter feature later
-- things like `week 14-24` and `week 1,3,7,34` are not supported yet
-- the OSM input string is not validated yet
-- No support for constrained weekdays yet `Th[1,2-3], Fr[-1]`
-- No support for calculations yet `Sa[-1],Sa[-1] +1 day`
+- holidays (`PH`, `SH`) are only supported at the beginning of a rule and via special filters
+- additional (`,`) and fallback (`||`) rule separators, comments, extended times like `22:00-26:00`
+  and event times like `sunrise` are not supported yet
